@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isMember(connectionId) {
+      return isSignedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.members;
+    }
+
+    // Users: only the owner can read or write their own user doc.
+    match /users/{uid} {
+      allow read, write: if isSelf(uid);
+    }
+
+    // Connections (a user has many). Client writes happen via transactions
+    // (createConnection and joinByInvite). The join flow must read the
+    // connection doc BEFORE becoming a member, so read is open to any
+    // signed-in user (docs only hold anonymous UIDs, names and timestamps —
+    // an acceptable leak for this app; document ids are random).
+    match /connections/{connectionId} {
+      allow read: if isSignedIn();
+
+      // Create: a brand-new connection containing only the creator.
+      allow create: if isSignedIn()
+        && request.resource.data.members is list
+        && request.resource.data.members.size() == 1
+        && request.resource.data.members[0] == request.auth.uid;
+
+      // Two legitimate update shapes:
+      // (a) Join — caller is not yet a member, becomes one (members grows by
+      //     exactly one), and only members + names change.
+      allow update: if isSignedIn()
+        && !(request.auth.uid in resource.data.members)
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members.size() == resource.data.members.size() + 1
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'names']);
+
+      // (b) Last-photo metadata bump by an existing member (set merge on upload).
+      allow update: if isSignedIn()
+        && request.auth.uid in resource.data.members
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['lastPhotoAt', 'lastPhotoUrl']);
+    }
+
+    // Photos: only members of the photo's connection can read; only the sender
+    // (a member) can create; no client updates or deletes for now.
+    match /photos/{photoId} {
+      allow read: if isMember(resource.data.connectionId);
+
+      allow create: if isSignedIn()
+        && request.resource.data.senderId == request.auth.uid
+        && isMember(request.resource.data.connectionId);
+
+      allow update, delete: if false;
+    }
+
+    // Invites: any signed-in user can read by code (so the joiner can look it
+    // up). Creation must include the caller as createdBy and reference a
+    // connection they belong to. Updates are allowed only to mark used=true.
+    match /invites/{code} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && isMember(request.resource.data.connectionId)
+        && request.resource.data.used == false;
+
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used'])
+        && request.resource.data.used == true;
+
+      allow delete: if false;
+    }
+  }
+}

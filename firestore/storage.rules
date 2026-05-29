@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(connectionId) {
+      return isSignedIn() &&
+        request.auth.uid in firestore.get(
+          /databases/(default)/documents/connections/$(connectionId)
+        ).data.members;
+    }
+
+    // Photos: only members of the connection can read or upload.
+    // Uploads are capped at 5MB and must be JPEG.
+    match /photos/{connectionId}/{photoFile} {
+      allow read: if isMember(connectionId);
+
+      allow write: if isMember(connectionId)
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType == 'image/jpeg';
+    }
+  }
+}
