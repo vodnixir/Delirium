@@ -15,6 +15,8 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -63,18 +65,27 @@ class DeliriumGlanceWidget : GlanceAppWidget() {
             } else {
                 context.getString(R.string.app_name)
             }
-            WidgetContent(bitmap, placeholder)
+            WidgetContent(bitmap, placeholder, connectionId)
         }
     }
 
     @Composable
-    private fun WidgetContent(bitmap: Bitmap?, placeholder: String) {
+    private fun WidgetContent(bitmap: Bitmap?, placeholder: String, connectionId: String?) {
+        // Tapping a configured widget opens that friend's feed; an unconfigured one
+        // just opens the app (it has no connection bound yet).
+        val launch = if (connectionId != null) {
+            actionStartActivity<MainActivity>(
+                actionParametersOf(KEY_LAUNCH_CONNECTION to connectionId),
+            )
+        } else {
+            actionStartActivity<MainActivity>()
+        }
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .cornerRadius(24.dp)
                 .background(Color(0xFF1A1024))
-                .clickable(actionStartActivity<MainActivity>()),
+                .clickable(launch),
             contentAlignment = Alignment.Center,
         ) {
             when {
@@ -101,5 +112,9 @@ class DeliriumGlanceWidget : GlanceAppWidget() {
     companion object {
         val KEY_CONNECTION_ID = stringPreferencesKey("widget_connection_id")
         val KEY_PHOTO_PATH = stringPreferencesKey("widget_photo_path")
+
+        /** Intent extra naming the connection a tapped widget should open. */
+        const val EXTRA_CONNECTION_ID = "delirium.widget.connectionId"
+        val KEY_LAUNCH_CONNECTION = ActionParameters.Key<String>(EXTRA_CONNECTION_ID)
     }
 }

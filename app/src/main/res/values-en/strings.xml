@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Delirium</string>
+
+    <!-- Splash -->
+    <string name="pairing_signed_in">Signing in…</string>
+
+    <!-- Auth -->
+    <string name="auth_login_title">Welcome back</string>
+    <string name="auth_register_title">Create account</string>
+    <string name="auth_tagline">Share moments with people close to you</string>
+    <string name="auth_username">Username</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_display_name">Your name</string>
+    <string name="auth_login">Log in</string>
+    <string name="auth_create">Create account</string>
+    <string name="auth_to_register">No account? Create one</string>
+    <string name="auth_to_login">Already have an account? Log in</string>
+    <string name="auth_fill_all">Fill in all fields</string>
+    <string name="auth_username_hint">3–20 chars: letters, digits, _</string>
+    <string name="error_network">Couldn\'t reach the server. Check your connection (and VPN if enabled) and try again.</string>
+
+    <!-- Friends -->
+    <string name="friends_title">Friends</string>
+    <string name="friends_add">Add friend</string>
+    <string name="friends_empty">No friends yet. Add your first!</string>
+    <string name="friends_waiting">Waiting for your friend to join…</string>
+    <string name="friends_open_hint">Open feed</string>
+    <string name="friends_empty_title">No friends yet</string>
+    <string name="friends_empty_subtitle">Add your first to start sharing photos</string>
+    <string name="friends_count">%1$d of %2$d</string>
+    <string name="friends_limit_reached">Limit reached — %1$d friends</string>
+    <string name="friends_delete_title">Remove friend?</string>
+    <string name="friends_delete_message">“%1$s” and all your shared photos will be deleted for both of you. This can\'t be undone.</string>
+    <string name="friends_delete">Remove friend</string>
+    <string name="friends_open_chat">Open chat</string>
+    <string name="tab_chats">Chats</string>
+    <string name="chats_empty_title">No chats yet</string>
+    <string name="chats_empty_subtitle">Send or receive a photo to start</string>
+    <string name="chats_last_photo">Latest photo</string>
+
+    <!-- Relative time -->
+    <string name="time_now">now</string>
+    <string name="time_minutes">%1$dm</string>
+    <string name="time_hours">%1$dh</string>
+    <string name="time_days">%1$dd</string>
+    <string name="time_weeks">%1$dw</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_change_name">Edit name</string>
+    <string name="profile_appearance">Appearance</string>
+    <string name="profile_appearance_sub">Themes and colors</string>
+    <string name="profile_widget">Widget</string>
+    <string name="profile_widget_sub">Friends\' photos on your home screen</string>
+    <string name="profile_logout">Log out</string>
+    <string name="profile_name_label">Name</string>
+
+    <!-- Add friend -->
+    <string name="addfriend_title">Add friend</string>
+    <string name="addfriend_your_name">Your name</string>
+    <string name="addfriend_create_code">Create code</string>
+    <string name="addfriend_enter_code">Enter friend\'s code</string>
+    <string name="addfriend_code_hint">6-digit code</string>
+    <string name="addfriend_join">Join</string>
+    <string name="addfriend_share">Share this code with your friend:</string>
+    <string name="addfriend_shared">I\'ve shared it</string>
+    <string name="addfriend_enter_name">Enter your name</string>
+    <string name="addfriend_err_create">Couldn\'t create code</string>
+    <string name="addfriend_err_join">Couldn\'t join</string>
+
+    <!-- Camera / capture -->
+    <string name="camera_permission_required">Camera permission needed</string>
+    <string name="camera_grant">Grant permission</string>
+    <string name="camera_switch">Switch camera</string>
+    <string name="camera_hold_for_video">Tap for photo, hold for video</string>
+    <string name="camera_recording">Recording…</string>
+    <string name="video_play">Play video</string>
+    <string name="capture_permission_title">Camera access needed</string>
+    <string name="capture_permission_subtitle">Allow access to take photos</string>
+    <string name="capture_draw">Draw</string>
+    <string name="capture_pick_recipient">Choose who to send to</string>
+    <string name="capture_send_failed">Couldn\'t send</string>
+
+    <!-- Feed -->
+    <string name="feed_empty">No photos yet. Send the first!</string>
+    <string name="feed_new">Add</string>
+    <string name="feed_camera">Camera</string>
+    <string name="feed_gallery">Gallery</string>
+    <string name="feed_draw">Drawing</string>
+
+    <!-- Main tabs -->
+    <string name="tab_history">History</string>
+
+    <!-- History -->
+    <string name="history_empty_title">Nothing here yet</string>
+    <string name="history_empty_subtitle">All received photos will appear here</string>
+    <string name="history_filter_all">All</string>
+
+    <!-- Capture preview -->
+    <string name="preview_title">Preview</string>
+    <string name="preview_recipients">Send to</string>
+    <string name="preview_no_friends">Add a friend first</string>
+    <string name="preview_send">Send</string>
+    <string name="preview_send_count">Send · %1$d</string>
+    <string name="preview_caption_hint">Add a caption…</string>
+
+    <!-- Draw -->
+    <string name="draw_title">Drawing</string>
+    <string name="draw_send">Send</string>
+    <string name="draw_undo">Undo</string>
+    <string name="draw_clear">Clear</string>
+    <string name="draw_eraser">Eraser</string>
+    <string name="draw_background">Background from gallery</string>
+
+    <!-- Photo detail -->
+    <string name="photo_unknown_author">Friend</string>
+    <string name="photo_chat">Messages</string>
+    <string name="photo_chat_empty">No messages yet. Be the first!</string>
+    <string name="photo_message_hint">Message…</string>
+    <string name="photo_send">Send</string>
+    <string name="photo_saved">Saved to gallery</string>
+    <string name="photo_save_failed">Couldn\'t save</string>
+    <string name="photo_save_to_gallery">Save to gallery</string>
+    <string name="photo_seen">✓ Seen</string>
+    <string name="photo_pick_reaction">Pick a reaction</string>
+
+    <!-- Recap -->
+    <string name="recap_empty_title">Nothing to show yet</string>
+    <string name="recap_empty_subtitle">Receive photos from friends and a recap will appear here</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_reminder_section">Reminder</string>
+    <string name="settings_daily_reminder">Daily reminder</string>
+    <string name="settings_reminder_hint">We won\'t nudge you if you already posted</string>
+    <string name="settings_time">Time</string>
+    <string name="settings_theme_dark">Dark theme</string>
+    <string name="settings_theme_light">Light theme</string>
+
+    <!-- Themes -->
+    <string name="theme_midnight">Midnight</string>
+    <string name="theme_ocean">Ocean</string>
+    <string name="theme_sunset">Sunset</string>
+    <string name="theme_daylight">Daylight</string>
+
+    <!-- Widget config -->
+    <string name="widget_config_title">Choose a friend for the widget</string>
+    <string name="widget_config_empty">Add a friend in the app first</string>
+    <string name="widget_tap_configure">Tap to set up</string>
+    <string name="widget_description">A friend\'s latest photo</string>
+
+    <!-- Widget setup -->
+    <string name="widget_setup_title">Widget</string>
+    <string name="widget_setup_intro">Add a widget to see friends\' photos right on your home screen — without opening the app.</string>
+    <string name="widget_setup_step1">Long-press an empty spot on your home screen.</string>
+    <string name="widget_setup_step2">Pick “Widgets” in the menu that appears.</string>
+    <string name="widget_setup_step3">Find Delirium in the list and drag the widget onto the screen.</string>
+    <string name="widget_setup_step4">The widget shows a friend\'s latest photo. Multiple friends — multiple widgets.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_photos_name">New photos</string>
+    <string name="notif_channel_photos_desc">When a friend sends a new photo</string>
+    <string name="notif_channel_reminders_name">Reminders</string>
+    <string name="notif_channel_reminders_desc">Daily reminder to take a photo</string>
+    <string name="notif_new_photo_body">sent a new photo 📸</string>
+    <string name="notif_reminder_title">Time for a photo ✨</string>
+    <string name="notif_reminder_body">Take a photo and share the moment with friends</string>
+
+    <!-- Image errors -->
+    <string name="img_err_open">Couldn\'t open the image</string>
+    <string name="img_err_empty">The image is empty or unavailable</string>
+    <string name="img_err_decode">Couldn\'t read the image (unsupported format)</string>
+
+    <!-- Common -->
+    <string name="common_loading">Loading…</string>
+    <string name="common_error">Something went wrong</string>
+    <string name="common_retry">Try again</string>
+    <string name="common_back">Back</string>
+    <string name="common_copy">Copy</string>
+    <string name="common_save">Save</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_close">Close</string>
+    <string name="common_selected">Selected</string>
+</resources>

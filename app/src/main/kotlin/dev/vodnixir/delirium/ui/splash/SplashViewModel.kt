@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-enum class SplashTarget { Pending, Ready }
+enum class SplashTarget { Pending, Login, Main }
 
 class SplashViewModel(
     private val authRepository: AuthRepository,
@@ -21,12 +21,13 @@ class SplashViewModel(
 
     init {
         viewModelScope.launch {
-            runCatching {
-                authRepository.signInAnonymouslyIfNeeded()
+            _target.value = if (authRepository.isSignedIn) {
                 // Token sync is best-effort; do not block splash on it.
                 runCatching { fcmTokenSyncer.syncCurrentToken() }
+                SplashTarget.Main
+            } else {
+                SplashTarget.Login
             }
-            _target.value = SplashTarget.Ready
         }
     }
 }

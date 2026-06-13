@@ -16,6 +16,20 @@ service cloud.firestore {
         request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.members;
     }
 
+    // True if the caller is a member of the connection the photo belongs to.
+    function isPhotoMember(photoId) {
+      return isMember(
+        get(/databases/$(database)/documents/photos/$(photoId)).data.connectionId
+      );
+    }
+
+    // Usernames: holds password hashes and the uid behind each name. Written
+    // and read only by Cloud Functions (admin SDK bypasses rules); clients must
+    // never touch this collection.
+    match /usernames/{username} {
+      allow read, write: if false;
+    }
+
     // Users: only the owner can read or write their own user doc.
     match /users/{uid} {
       allow read, write: if isSelf(uid);
@@ -44,11 +58,16 @@ service cloud.firestore {
         && request.resource.data.members.size() == resource.data.members.size() + 1
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'names']);
 
-      // (b) Last-photo metadata bump by an existing member (set merge on upload).
+      // (b) An existing member bumps last-photo metadata (set merge on upload)
+      //     or updates the shared name / avatar maps (rename, avatar change).
       allow update: if isSignedIn()
         && request.auth.uid in resource.data.members
         && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['lastPhotoAt', 'lastPhotoUrl']);
+             .hasOnly(['lastPhotoAt', 'lastPhotoUrl', 'names', 'avatars']);
+
+      // A member may delete the connection (remove friend); a Cloud Function
+      // then wipes the connection's photos and Storage files.
+      allow delete: if isSignedIn() && request.auth.uid in resource.data.members;
     }
 
     // Photos: only members of the photo's connection can read; only the sender
@@ -61,6 +80,34 @@ service cloud.firestore {
         && isMember(request.resource.data.connectionId);
 
       allow update, delete: if false;
+
+      // Reactions: one doc per member (doc id = uid). Members can read all and
+      // write only their own. Reactions are emoji-only, never counted.
+      match /reactions/{userId} {
+        allow read: if isPhotoMember(photoId);
+        allow create, update: if isPhotoMember(photoId)
+          && userId == request.auth.uid
+          && request.resource.data.fromUserId == request.auth.uid;
+        allow delete: if isPhotoMember(photoId)
+          && userId == request.auth.uid;
+      }
+
+      // Chat thread: members read all; each may append messages authored by
+      // themselves; no edits or deletes.
+      match /messages/{messageId} {
+        allow read: if isPhotoMember(photoId);
+        allow create: if isPhotoMember(photoId)
+          && request.resource.data.fromUserId == request.auth.uid;
+        allow update, delete: if false;
+      }
+
+      // Views: a member records that they opened the photo (doc id = uid). A
+      // Cloud Function denormalizes these into photos/{id}.seenBy.
+      match /views/{userId} {
+        allow read: if isPhotoMember(photoId);
+        allow create, update: if isPhotoMember(photoId) && userId == request.auth.uid;
+        allow delete: if false;
+      }
     }
 
     // Invites: any signed-in user can read by code (so the joiner can look it
@@ -79,6 +126,13 @@ service cloud.firestore {
         && request.resource.data.used == true;
 
       allow delete: if false;
+    }
+
+    // Crash reports: a signed-in client may append its own crash; nobody can
+    // read or modify them from a client — only the admin panel (Admin SDK).
+    match /crashReports/{reportId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if false;
     }
   }
 }

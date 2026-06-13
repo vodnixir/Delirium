@@ -1,8 +1,9 @@
 package dev.vodnixir.delirium.ui.friends
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.vodnixir.delirium.data.auth.AuthRepository
+import dev.vodnixir.delirium.R
 import dev.vodnixir.delirium.data.connection.ConnectionRepository
 import dev.vodnixir.delirium.data.local.PreferencesRepository
 import kotlinx.coroutines.channels.Channel
@@ -29,9 +30,9 @@ sealed interface AddFriendEvent {
 }
 
 class AddFriendViewModel(
-    private val authRepository: AuthRepository,
     private val connectionRepository: ConnectionRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val appContext: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddFriendUiState())
@@ -63,13 +64,12 @@ class AddFriendViewModel(
     fun onCreateCodeClicked() {
         val name = _state.value.name.trim()
         if (name.isEmpty()) {
-            _state.update { it.copy(error = "Введите имя") }
+            _state.update { it.copy(error = appContext.getString(R.string.addfriend_enter_name)) }
             return
         }
         viewModelScope.launch {
             _state.update { it.copy(phase = AddFriendPhase.Loading) }
             runCatching {
-                authRepository.signInAnonymouslyIfNeeded()
                 preferencesRepository.setMyName(name)
                 val connectionId = connectionRepository.createConnection(name)
                 connectionRepository.createInvite(connectionId)
@@ -77,7 +77,10 @@ class AddFriendViewModel(
                 _state.update { it.copy(phase = AddFriendPhase.ShowingCode, generatedCode = code) }
             }.onFailure { e ->
                 _state.update {
-                    it.copy(phase = AddFriendPhase.Choosing, error = e.message ?: "Не удалось создать код")
+                    it.copy(
+                        phase = AddFriendPhase.Choosing,
+                        error = e.message ?: appContext.getString(R.string.addfriend_err_create),
+                    )
                 }
             }
         }
@@ -87,20 +90,22 @@ class AddFriendViewModel(
         val name = _state.value.name.trim()
         val code = _state.value.inputCode
         if (name.isEmpty()) {
-            _state.update { it.copy(error = "Введите имя") }
+            _state.update { it.copy(error = appContext.getString(R.string.addfriend_enter_name)) }
             return
         }
         viewModelScope.launch {
             _state.update { it.copy(phase = AddFriendPhase.Loading) }
             runCatching {
-                authRepository.signInAnonymouslyIfNeeded()
                 preferencesRepository.setMyName(name)
                 connectionRepository.joinByInvite(code, name)
             }.onSuccess {
                 _events.send(AddFriendEvent.Done)
             }.onFailure { e ->
                 _state.update {
-                    it.copy(phase = AddFriendPhase.EnteringCode, error = e.message ?: "Не удалось присоединиться")
+                    it.copy(
+                        phase = AddFriendPhase.EnteringCode,
+                        error = e.message ?: appContext.getString(R.string.addfriend_err_join),
+                    )
                 }
             }
         }

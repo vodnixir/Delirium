@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.vodnixir.delirium.data.auth.AuthRepository
-import dev.vodnixir.delirium.data.photo.PhotoRepository
+import dev.vodnixir.delirium.data.outbox.OutboxRepository
 import dev.vodnixir.delirium.ui.camera.toCompressedJpeg
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +29,7 @@ sealed interface DrawEvent {
 class DrawViewModel(
     private val connectionId: String,
     private val authRepository: AuthRepository,
-    private val photoRepository: PhotoRepository,
+    private val outboxRepository: OutboxRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<DrawUploadState>(DrawUploadState.Idle)
@@ -45,7 +45,7 @@ class DrawViewModel(
             runCatching {
                 val uid = authRepository.currentUserId ?: error("Not signed in")
                 val bytes = withContext(Dispatchers.Default) { bitmap.toCompressedJpeg() }
-                photoRepository.uploadPhoto(connectionId, uid, bytes)
+                withContext(Dispatchers.IO) { outboxRepository.enqueue(connectionId, uid, bytes) }
             }.onSuccess {
                 _state.value = DrawUploadState.Idle
                 _events.send(DrawEvent.Sent)

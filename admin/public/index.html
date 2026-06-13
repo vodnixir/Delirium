@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delirium · Админка</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 -apple-system, system-ui, sans-serif;
+         background: #0d0a14; color: #ede7f6; }
+  header { padding: 20px 24px; border-bottom: 1px solid #271d3d;
+           display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 20px; margin: 0;
+              background: linear-gradient(90deg,#b794ff,#f2a6d6);
+              -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tabs { display: flex; gap: 8px; padding: 16px 24px 0; }
+  .tab { padding: 8px 16px; border-radius: 999px; cursor: pointer;
+         background: #1e1730; color: #b7abcc; border: none; font: inherit; }
+  .tab.active { background: #b794ff; color: #20003d; font-weight: 600; }
+  main { padding: 20px 24px; max-width: 980px; }
+  .card { background: #15101f; border: 1px solid #271d3d; border-radius: 16px;
+          padding: 16px; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .grow { flex: 1; min-width: 120px; }
+  .muted { color: #b7abcc; font-size: 13px; }
+  input { background: #271d3d; border: 1px solid #4b3f66; color: #ede7f6;
+          border-radius: 10px; padding: 9px 12px; font: inherit; }
+  button.act { background: #b794ff; color: #20003d; border: none; border-radius: 10px;
+               padding: 9px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  button.danger { background: #ff6b6b; color: #2a0000; }
+  button.ghost { background: transparent; color: #b7abcc; border: 1px solid #4b3f66; }
+  pre { white-space: pre-wrap; word-break: break-word; background: #0d0a14;
+        border-radius: 10px; padding: 12px; margin: 8px 0 0; font-size: 12px;
+        color: #cbb; max-height: 260px; overflow: auto; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+            background: #3a1e66; display: inline-flex; align-items: center;
+            justify-content: center; font-weight: 600; }
+  .hidden { display: none; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+           background: #1e1730; border: 1px solid #4b3f66; padding: 12px 18px;
+           border-radius: 12px; opacity: 0; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <header><h1>Delirium</h1><span class="muted">админ-панель · localhost</span></header>
+  <div class="tabs">
+    <button class="tab active" data-tab="users" onclick="switchTab('users')">Пользователи</button>
+    <button class="tab" data-tab="crashes" onclick="switchTab('crashes')">Ошибки</button>
+  </div>
+
+  <main>
+    <div id="users">
+      <div class="row" style="margin-bottom:12px">
+        <button class="ghost" onclick="loadUsers()">↻ Обновить</button>
+        <span class="muted" id="usersCount"></span>
+      </div>
+      <div id="usersList"></div>
+    </div>
+
+    <div id="crashes" class="hidden">
+      <div class="row" style="margin-bottom:12px">
+        <button class="ghost" onclick="loadCrashes()">↻ Обновить</button>
+        <button class="danger" onclick="clearCrashes()">Очистить все</button>
+        <span class="muted" id="crashCount"></span>
+      </div>
+      <div id="crashList"></div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let toastT;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200);
+}
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  $("users").classList.toggle("hidden", name !== "users");
+  $("crashes").classList.toggle("hidden", name !== "crashes");
+  if (name === "crashes") loadCrashes();
+}
+
+async function loadUsers() {
+  try {
+    const users = await api("/api/users");
+    $("usersCount").textContent = users.length + " аккаунтов";
+    $("usersList").innerHTML = users.map(u => `
+      <div class="card">
+        <div class="row">
+          ${u.avatarUrl ? `<img class="avatar" src="${esc(u.avatarUrl)}"/>` : `<span class="avatar">${esc((u.displayName||u.username||"?")[0]).toUpperCase()}</span>`}
+          <div class="grow">
+            <b>${esc(u.displayName || "—")}</b>
+            <div class="muted">@${esc(u.username)} · ${esc(u.uid)}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input class="grow" type="text" placeholder="Новый пароль (мин. 6)" id="pw_${esc(u.username)}"/>
+          <button class="act" onclick="resetPw('${esc(u.username)}')">Сменить пароль</button>
+          <button class="danger" onclick="delUser('${esc(u.username)}')">Удалить</button>
+        </div>
+      </div>`).join("") || `<div class="muted">Пока нет аккаунтов</div>`;
+  } catch (e) { toast("Ошибка: " + e.message); }
+}
+async function resetPw(username) {
+  const pw = $("pw_" + username).value;
+  try { await api("/api/reset-password", { username, password: pw }); toast("Пароль обновлён для @" + username); $("pw_"+username).value=""; }
+  catch (e) { toast("Ошибка: " + e.message); }
+}
+async function delUser(username) {
+  if (!confirm("Удалить @" + username + "? Аккаунт, связи и фото будут удалены.")) return;
+  try { await api("/api/delete-user", { username }); toast("Удалён @" + username); loadUsers(); }
+  catch (e) { toast("Ошибка: " + e.message); }
+}
+
+async function loadCrashes() {
+  try {
+    const crashes = await api("/api/crashes");
+    $("crashCount").textContent = crashes.length + " за последние записи";
+    $("crashList").innerHTML = crashes.map(c => `
+      <div class="card">
+        <div class="row">
+          <div class="grow">
+            <b>${esc(c.device || "?")}</b> <span class="muted">· Android ${esc(c.androidSdk)} · ${esc(c.appVersion)}</span>
+            <div class="muted">${new Date(Number(c.createdAt)||0).toLocaleString()} · uid ${esc(c.uid||"—")}</div>
+          </div>
+          <button class="ghost" onclick="delCrash('${esc(c.id)}')">Скрыть</button>
+        </div>
+        <pre>${esc(c.stacktrace || "")}</pre>
+      </div>`).join("") || `<div class="muted">Крашей нет 🎉</div>`;
+  } catch (e) { toast("Ошибка: " + e.message); }
+}
+async function delCrash(id) { try { await api("/api/delete-crash", { id }); loadCrashes(); } catch (e) { toast(e.message); } }
+async function clearCrashes() { if (!confirm("Очистить все отчёты?")) return; try { await api("/api/clear-crashes", {}); loadCrashes(); } catch (e) { toast(e.message); } }
+
+loadUsers();
+</script>
+</body>
+</html>

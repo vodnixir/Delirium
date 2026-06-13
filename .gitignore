@@ -33,6 +33,11 @@ Thumbs.db
 # When cloning fresh, drop a new copy into app/google-services.json.
 app/google-services.json
 
+# Release signing — never commit the keystore or its passwords.
+keystore.properties
+*.jks
+*.keystore
+
 # Logs
 *.log
 

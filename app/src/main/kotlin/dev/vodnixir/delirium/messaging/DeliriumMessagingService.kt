@@ -3,6 +3,7 @@ package dev.vodnixir.delirium.messaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dev.vodnixir.delirium.DeliriumApplication
+import dev.vodnixir.delirium.R
 import dev.vodnixir.delirium.widget.WidgetPhotoSync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,14 @@ class DeliriumMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val connectionId = message.data["connectionId"]
         val photoUrl = message.data["photoUrl"]
+        val senderName = message.data["senderName"] ?: getString(R.string.photo_unknown_author)
         val service = this
+
+        // Surface a system notification about the new photo (separate from the
+        // silent widget refresh below).
+        if (connectionId != null) {
+            AppNotifications.showNewPhoto(service, senderName, connectionId)
+        }
         // High-priority FCM data messages give us ~20s to do background work.
         // Block here so the OS keeps the service alive until the widget updates.
         runBlocking {

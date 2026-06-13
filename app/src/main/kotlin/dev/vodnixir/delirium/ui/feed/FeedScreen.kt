@@ -3,11 +3,14 @@ package dev.vodnixir.delirium.ui.feed
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,7 +33,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,25 +43,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import dev.vodnixir.delirium.R
+import dev.vodnixir.delirium.ui.components.PhotoReactionsBadge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
     viewModel: FeedViewModel,
-    friendName: String,
     onTakePhoto: () -> Unit,
     onDraw: () -> Unit,
+    onOpenPhoto: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val photos by viewModel.photos.collectAsStateWithLifecycle()
     val uploading by viewModel.uploading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+    val friendName by viewModel.friendName.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var menuOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.dismissError()
+        }
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
@@ -119,15 +138,37 @@ fun FeedScreen(
                     contentPadding = PaddingValues(12.dp),
                 ) {
                     items(items = photos, key = { it.id }) { photo ->
-                        AsyncImage(
-                            model = photo.storageUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
+                        Box(
                             modifier = Modifier
                                 .padding(4.dp)
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp)),
-                        )
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { onOpenPhoto(photo.id) },
+                        ) {
+                            AsyncImage(
+                                model = photo.displayUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                            if (photo.isVideo) {
+                                Icon(
+                                    Icons.Default.PlayCircle,
+                                    contentDescription = stringResource(R.string.video_play),
+                                    tint = Color.White,
+                                    modifier = Modifier.align(Alignment.Center).size(44.dp),
+                                )
+                            }
+                            if (photo.reactionEmojis.isNotEmpty()) {
+                                PhotoReactionsBadge(
+                                    emojis = photo.reactionEmojis,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(6.dp),
+                                )
+                            }
+                        }
                     }
                 }
             }

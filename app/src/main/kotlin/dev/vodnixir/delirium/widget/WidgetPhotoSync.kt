@@ -35,7 +35,8 @@ object WidgetPhotoSync {
             WidgetUpdater.refreshConnection(context, connectionId)
             return false
         }
-        val bytes = download(photo.storageUrl)
+        // For video posts this is the still thumbnail; the widget only shows bitmaps.
+        val bytes = download(photo.displayUrl)
         container.photoCache.saveFromBytes(connectionId, bytes)
         container.preferencesRepository.setCachedPhotoId(connectionId, photo.id)
         Log.d(TAG, "syncConnection: cached new photo ${photo.id}, refreshing widget")

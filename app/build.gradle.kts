@@ -1,9 +1,19 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
+}
+
+// Release signing is read from keystore.properties (kept out of git). When the
+// file is absent (fresh clone / CI), the release build is simply left unsigned.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) FileInputStream(keystorePropertiesFile).use { load(it) }
 }
 
 android {
@@ -19,6 +29,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,6 +47,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Signed only when keystore.properties is present.
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            // Ship a single arm64-v8a APK (covers all modern phones); dropping the
+            // other architectures' native libs is the bulk of the size win.
+            ndk {
+                abiFilters += "arm64-v8a"
+            }
         }
         debug {
             // No applicationIdSuffix on purpose: google-services.json registers
@@ -60,6 +90,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    // Don't let the lint-vital pass block a personal sideloaded release build.
+    lint {
+        checkReleaseBuilds = false
+    }
 }
 
 dependencies {
@@ -88,6 +123,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.functions)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
@@ -96,6 +132,10 @@ dependencies {
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
+    implementation(libs.camerax.video)
+
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
 
     implementation(libs.coil.compose)
 

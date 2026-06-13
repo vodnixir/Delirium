@@ -1,0 +1,15 @@
+{
+  "name": "delirium-admin",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local admin panel for Delirium: reset passwords, moderate users, view crashes.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.0",
+    "firebase-admin": "^12.7.0"
+  }
+}

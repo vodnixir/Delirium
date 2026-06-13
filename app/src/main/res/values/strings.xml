@@ -3,7 +3,22 @@
     <string name="app_name">Delirium</string>
 
     <!-- Splash -->
-    <string name="pairing_signed_in">Signing in…</string>
+    <string name="pairing_signed_in">Вход…</string>
+
+    <!-- Auth -->
+    <string name="auth_login_title">С возвращением</string>
+    <string name="auth_register_title">Создать аккаунт</string>
+    <string name="auth_tagline">Делись моментами с близкими</string>
+    <string name="auth_username">Имя пользователя</string>
+    <string name="auth_password">Пароль</string>
+    <string name="auth_display_name">Как тебя зовут</string>
+    <string name="auth_login">Войти</string>
+    <string name="auth_create">Создать аккаунт</string>
+    <string name="auth_to_register">Нет аккаунта? Создать</string>
+    <string name="auth_to_login">Уже есть аккаунт? Войти</string>
+    <string name="auth_fill_all">Заполните все поля</string>
+    <string name="auth_username_hint">3–20 символов: латиница, цифры, _</string>
+    <string name="error_network">Не удалось связаться с сервером. Проверьте интернет (и VPN, если включён) и повторите.</string>
 
     <!-- Friends -->
     <string name="friends_title">Друзья</string>
@@ -11,6 +26,36 @@
     <string name="friends_empty">Пока нет друзей. Добавь первого!</string>
     <string name="friends_waiting">Ждём, пока друг присоединится…</string>
     <string name="friends_open_hint">Открыть ленту</string>
+    <string name="friends_empty_title">Пока нет друзей</string>
+    <string name="friends_empty_subtitle">Добавь первого, чтобы делиться фото</string>
+    <string name="friends_count">%1$d из %2$d</string>
+    <string name="friends_limit_reached">Достигнут лимит — %1$d друзей</string>
+    <string name="friends_delete_title">Удалить друга?</string>
+    <string name="friends_delete_message">«%1$s» и вся ваша переписка с фото удалятся у обоих. Это необратимо.</string>
+    <string name="friends_delete">Удалить друга</string>
+    <string name="friends_open_chat">Открыть переписку</string>
+    <string name="tab_chats">Чаты</string>
+    <string name="chats_empty_title">Нет переписок</string>
+    <string name="chats_empty_subtitle">Отправь или получи фото, чтобы начать</string>
+    <string name="chats_last_photo">Последнее фото</string>
+
+    <!-- Relative time -->
+    <string name="time_now">сейчас</string>
+    <string name="time_minutes">%1$d мин</string>
+    <string name="time_hours">%1$d ч</string>
+    <string name="time_days">%1$d дн</string>
+    <string name="time_weeks">%1$d нед</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Профиль</string>
+    <string name="profile_change_photo">Сменить фото</string>
+    <string name="profile_change_name">Изменить имя</string>
+    <string name="profile_appearance">Оформление</string>
+    <string name="profile_appearance_sub">Темы и цвета</string>
+    <string name="profile_widget">Виджет</string>
+    <string name="profile_widget_sub">Фото друзей на главном экране</string>
+    <string name="profile_logout">Выйти из аккаунта</string>
+    <string name="profile_name_label">Имя</string>
 
     <!-- Add friend -->
     <string name="addfriend_title">Добавить друга</string>
@@ -21,11 +66,22 @@
     <string name="addfriend_join">Присоединиться</string>
     <string name="addfriend_share">Поделись этим кодом с другом:</string>
     <string name="addfriend_shared">Я поделился</string>
+    <string name="addfriend_enter_name">Введите имя</string>
+    <string name="addfriend_err_create">Не удалось создать код</string>
+    <string name="addfriend_err_join">Не удалось присоединиться</string>
 
-    <!-- Camera -->
+    <!-- Camera / capture -->
     <string name="camera_permission_required">Нужно разрешение на камеру</string>
     <string name="camera_grant">Дать разрешение</string>
     <string name="camera_switch">Переключить камеру</string>
+    <string name="camera_hold_for_video">Нажми — фото, удерживай — видео</string>
+    <string name="camera_recording">Запись…</string>
+    <string name="video_play">Воспроизвести видео</string>
+    <string name="capture_permission_title">Нужен доступ к камере</string>
+    <string name="capture_permission_subtitle">Разреши доступ, чтобы делать фото</string>
+    <string name="capture_draw">Рисовать</string>
+    <string name="capture_pick_recipient">Выбери, кому отправить</string>
+    <string name="capture_send_failed">Не удалось отправить</string>
 
     <!-- Feed -->
     <string name="feed_empty">Пока нет фото. Отправь первое!</string>
@@ -33,6 +89,22 @@
     <string name="feed_camera">Камера</string>
     <string name="feed_gallery">Галерея</string>
     <string name="feed_draw">Рисунок</string>
+
+    <!-- Main tabs -->
+    <string name="tab_history">История</string>
+
+    <!-- History -->
+    <string name="history_empty_title">Пока пусто</string>
+    <string name="history_empty_subtitle">Здесь появятся все полученные фото</string>
+    <string name="history_filter_all">Все</string>
+
+    <!-- Capture preview -->
+    <string name="preview_title">Превью</string>
+    <string name="preview_recipients">Кому отправить</string>
+    <string name="preview_no_friends">Сначала добавь друга</string>
+    <string name="preview_send">Отправить</string>
+    <string name="preview_send_count">Отправить · %1$d</string>
+    <string name="preview_caption_hint">Добавить подпись…</string>
 
     <!-- Draw -->
     <string name="draw_title">Рисунок</string>
@@ -42,10 +114,65 @@
     <string name="draw_eraser">Ластик</string>
     <string name="draw_background">Фон из галереи</string>
 
+    <!-- Photo detail -->
+    <string name="photo_unknown_author">Друг</string>
+    <string name="photo_chat">Сообщения</string>
+    <string name="photo_chat_empty">Пока нет сообщений. Напиши первым!</string>
+    <string name="photo_message_hint">Сообщение…</string>
+    <string name="photo_send">Отправить</string>
+    <string name="photo_saved">Сохранено в галерею</string>
+    <string name="photo_save_failed">Не удалось сохранить</string>
+    <string name="photo_save_to_gallery">Сохранить в галерею</string>
+    <string name="photo_seen">✓ Просмотрено</string>
+    <string name="photo_pick_reaction">Выбери реакцию</string>
+
+    <!-- Recap -->
+    <string name="recap_empty_title">Пока нечего показать</string>
+    <string name="recap_empty_subtitle">Получай фото от друзей — и здесь появится подборка</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_reminder_section">Напоминание</string>
+    <string name="settings_daily_reminder">Ежедневное напоминание</string>
+    <string name="settings_reminder_hint">Не дёргаем, если ты уже выложил фото</string>
+    <string name="settings_time">Время</string>
+    <string name="settings_theme_dark">Тёмная тема</string>
+    <string name="settings_theme_light">Светлая тема</string>
+
+    <!-- Themes -->
+    <string name="theme_midnight">Полночь</string>
+    <string name="theme_ocean">Океан</string>
+    <string name="theme_sunset">Закат</string>
+    <string name="theme_daylight">Светлая</string>
+
     <!-- Widget config -->
     <string name="widget_config_title">Выбери друга для виджета</string>
     <string name="widget_config_empty">Сначала добавь друга в приложении</string>
     <string name="widget_tap_configure">Нажми, чтобы настроить</string>
+    <string name="widget_description">Последнее фото от друга</string>
+
+    <!-- Widget setup -->
+    <string name="widget_setup_title">Виджет</string>
+    <string name="widget_setup_intro">Добавь виджет, чтобы видеть фото друзей прямо на главном экране — без открытия приложения.</string>
+    <string name="widget_setup_step1">Зажми пустое место на главном экране телефона.</string>
+    <string name="widget_setup_step2">Выбери «Виджеты» в появившемся меню.</string>
+    <string name="widget_setup_step3">Найди Delirium в списке и перетащи виджет на экран.</string>
+    <string name="widget_setup_step4">Виджет покажет последнее фото друга. Несколько друзей — несколько виджетов.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_photos_name">Новые фото</string>
+    <string name="notif_channel_photos_desc">Когда друг присылает новое фото</string>
+    <string name="notif_channel_reminders_name">Напоминания</string>
+    <string name="notif_channel_reminders_desc">Ежедневное напоминание сделать фото</string>
+    <string name="notif_new_photo_body">прислал новое фото 📸</string>
+    <string name="notif_reminder_title">Время для фото ✨</string>
+    <string name="notif_reminder_body">Сделай фото и поделись моментом с друзьями</string>
+
+    <!-- Image errors -->
+    <string name="img_err_open">Не удалось открыть изображение</string>
+    <string name="img_err_empty">Изображение пустое или недоступно</string>
+    <string name="img_err_decode">Не удалось прочитать изображение (формат не поддерживается)</string>
 
     <!-- Common -->
     <string name="common_loading">Загрузка…</string>
@@ -53,7 +180,9 @@
     <string name="common_retry">Повторить</string>
     <string name="common_back">Назад</string>
     <string name="common_copy">Копировать</string>
-
-    <!-- Widget -->
-    <string name="widget_description">Последнее фото от друга</string>
+    <string name="common_save">Сохранить</string>
+    <string name="common_cancel">Отмена</string>
+    <string name="common_delete">Удалить</string>
+    <string name="common_close">Закрыть</string>
+    <string name="common_selected">Выбрано</string>
 </resources>

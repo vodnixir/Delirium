@@ -14,13 +14,27 @@ service firebase.storage {
         ).data.members;
     }
 
-    // Photos: only members of the connection can read or upload.
-    // Uploads are capped at 5MB and must be JPEG.
+    // Photos & videos: only members of the connection can read or upload.
+    // JPEG photos (and video thumbnails) are capped at 5MB; MP4 clips at 30MB.
     match /photos/{connectionId}/{photoFile} {
       allow read: if isMember(connectionId);
 
-      allow write: if isMember(connectionId)
-        && request.resource.size < 5 * 1024 * 1024
+      allow write: if isMember(connectionId) && (
+        (request.resource.contentType == 'image/jpeg'
+          && request.resource.size < 5 * 1024 * 1024) ||
+        (request.resource.contentType == 'video/mp4'
+          && request.resource.size < 30 * 1024 * 1024)
+      );
+    }
+
+    // Avatars: anyone signed in can read (friends show each other's picture);
+    // only the owner can upload their own, capped at 2MB JPEG.
+    match /avatars/{uid}/{file} {
+      allow read: if isSignedIn();
+
+      allow write: if isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.size < 2 * 1024 * 1024
         && request.resource.contentType == 'image/jpeg';
     }
   }
